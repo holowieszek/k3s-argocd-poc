@@ -47,9 +47,6 @@ kind: Ingress
 metadata:
   name: app-1-ingress
   namespace: app-1
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-production
-    kubernetes.io/ingress.class: traefik
 spec:
   rules:
   - host: "app1.node1.k3s.homelab.internal"
@@ -66,16 +63,16 @@ spec:
   - hosts:
     - app1.node1.k3s.homelab.internal
     secretName: app-1-tls-secret              
-# ---
-# apiVersion: cert-manager.io/v1
-# kind: Certificate
-# metadata:
-#   name: app-1-cert
-#   namespace: app-1
-# spec:
-#   secretName: app-1-tls-secret
-#   issuerRef:
-#     name: ssl-issuer
-#     kind: ClusterIssuer
-#   dnsNames:
-#     - app1.node1.k3s.homelab.internal
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: app-1-cert
+  namespace: app-1
+spec:
+  secretName: app-1-tls-secret
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  dnsNames:
+    - app1.node1.k3s.homelab.internal
