@@ -15,7 +15,7 @@ data:
     <head>
       <title>Hello World!</title>
     </head>
-    <body>Test App v3!</body>
+    <body>Test App 2, ver. 0.0.0</body>
     </html>
 ---
 apiVersion: traefik.io/v1alpha1
