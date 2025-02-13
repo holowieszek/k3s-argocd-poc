@@ -1,0 +1,89 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test-app-2
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-app-2
+  namespace: test-app-2
+data:
+  index.html: |
+    <html>
+    <head>
+      <title>Hello World!</title>
+    </head>
+    <body>Test App v3!</body>
+    </html>
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: test-app-2-prefix
+  namespace: test-app-2
+spec:
+  stripPrefix:
+    prefixes:
+      - /test-app-2
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: test-app-2
+  namespace: test-app-2
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+    traefik.ingress.kubernetes.io/router.middlewares: test-app-2-test-app-2-prefix@kubernetescrd
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /test-app-2
+        pathType: Prefix
+        backend:
+          service:
+            name: test-app-2
+            port:
+              number: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-app-2
+  namespace: test-app-2
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+  selector:
+    app: test-app-2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-app-2-nginx
+  namespace: test-app-2
+spec:
+  selector:
+    matchLabels:
+      app: test-app-2
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: test-app-2
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: test-app-2-volume
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: test-app-2-volume
+        configMap:
+          name: test-app-2
